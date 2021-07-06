@@ -1,4 +1,4 @@
-# Conservation-Platform
+# EcoSense
 
 Nature conservation project to collect and upload data of ecosystems.
 
