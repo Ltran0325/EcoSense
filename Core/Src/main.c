@@ -19,10 +19,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "uart.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "uart.h"
+#include "api_camera.h"
+#include "api_wifi.h"
+#include "round_robin.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,41 +43,23 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-extern char RX_Buffer[BUFF_MAX];
 
 /* USER CODE BEGIN PV */
 
-// AT commands to send to Tx Buffer to the WE310F5-I dev kit
-static char AT_check[]   = "ATE0\r\n";
-static char AT_station[] = "AT+WNI=0\r\n";
-static char AT_scan[]    = "AT+WS=1\r\n";
-static char AT_connect[] = "AT+WNCN=1,\"Trans 5G\",\"2232portal\"\r\n";
-static char AT_ping[]    = "AT+NPING=8.8.8.8,100,4\r\n";
 
-// Hex commands to test SC03MPA camera
-static char HEX_Test1[4] = {0x28,0x29,0x2A,0x2B};	          // ()*'
-static char HEX_Test2[6] = {0x5A,0x5B,0x5C,0x5D,0xBE,0xEF};   // Z[\]
-
-char baud[] = {0x56, 0x00, 0x24, 0x03, 0x01, 0x0D, 0xA6};					// size 7
-char reset[] = {0x56, 0x00, 0x26, 0x00};									// size 4
-char imageres[] = {0x56, 0x00, 0x54, 0x01, 0x22};							// size 5
-char compress[] = {0x56, 0x00, 0x31, 0x05, 0x01, 0x01, 0x12, 0x04, 0x99};	// size 9
-char imageget[] = {0x56, 0x00, 0x36, 0x01, 0x00};							// size 5
-char imagelen[] = {0x56, 0x00, 0x34, 0x01, 0x00};
-char imagedata[] = {0x56, 0x00, 0x32, 0x0C, 0x00, 0x0A, 0x00, 0x00,
-		            0x00, 0x00, 0x00, 0x00, 0xBE, 0xEF, 0x00, 0x0A};
-char needle[] = {0x76,0x00,0x34,0x00,0x04,0x00,0x00};
 
 /* USER CODE END PV */
-
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,54 +72,56 @@ int main(void){
 	HAL_Init();
 	SystemClock_Config();
 	MX_GPIO_Init();
+	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
 	MX_USART3_UART_Init();
-	uint8_t i = 0;
-
-	// 1) Test Hex echo for camera
-	AT_command_IT(baud, sizeof(baud)/sizeof(baud[0]));
-	HAL_Delay(2000);
-
-	AT_command_IT(reset, sizeof(reset)/sizeof(reset[0]));
-	HAL_Delay(2000);
-
-	AT_command_IT(imageres, sizeof(imageres)/sizeof(imageres[0]));
-	HAL_Delay(2000);
-
-	AT_command_IT(compress, sizeof(compress)/sizeof(compress[0]));
-	HAL_Delay(2000);
-
-	AT_command_IT(imageget, sizeof(imageget)/sizeof(imageget[0]));
-	HAL_Delay(2000);
-
-	AT_command_IT(imagelen, sizeof(imagelen)/sizeof(imagelen[0]));
-	HAL_Delay(2000);
-	i = RX_parse(needle, sizeof(needle)/sizeof(needle[0]));
-
-	imagedata[12] = RX_Buffer[i];
-	imagedata[13] = RX_Buffer[i+1];
-
-	AT_command_IT(imagedata, sizeof(imagedata)/sizeof(imagedata[0]));
-	HAL_Delay(2000);
-
-	// 2) Test AT commands to WE310F5-I dev kit
-#if 0
-	AT_command_IT(AT_check, strlen(AT_check));
-
-	HAL_Delay(1000);
-	AT_command_IT(AT_station, strlen(AT_station));
-
-	HAL_Delay(1000);
-	AT_command_IT(AT_scan, strlen(AT_scan));
-
-	HAL_Delay(7000);
-	AT_command_IT(AT_connect, strlen(AT_connect));
-
-	HAL_Delay(7000);
-	AT_command_IT(AT_ping, strlen(AT_connect));
-#endif
 
 	while(1){
+
+		switch(rrCurrentState){
+
+		case START:
+
+			rrCurrentState = CAMERA;
+
+			break;
+
+		case CAMERA:
+
+			// camera image data get using SC03MPA module
+			api_camera_connect();
+
+			rrPreviousState = rrCurrentState;
+			rrCurrentState = WIFI;
+
+			break;
+
+		case WIFI:
+
+			// Wi-Fi ping to google.com using WE310F5-I dev kit
+			api_wifi_connect();
+
+			rrPreviousState = rrCurrentState;
+			rrCurrentState = DATA_AQ;
+
+			break;
+
+
+
+		case DATA_AQ:
+
+			// retreive information from sensors
+			api_camera_connect();
+			api_wifi_ping();
+
+			// upload information
+
+			// return to Wi-Fi or LTE
+			rrCurrentState = rrPreviousState;
+
+			break;
+
+		}
 
 	}
 
@@ -144,10 +131,6 @@ int main(void){
 
 /* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 
 /**
   * @brief System Clock Configuration
@@ -189,7 +172,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_USART3;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_USART3;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
@@ -202,6 +187,41 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+  USART1->CR1 |= USART_CR1_RXNEIE; // enable RX interrupt (always active)
+  /* USER CODE END USART1_Init 2 */
+
 }
 
 /**
@@ -345,4 +365,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-
