@@ -15,7 +15,7 @@ Nucleo L476RG
 
 #### Camera SC03MPA
 
-This module retrieves image capture data. Image data can be stored on an SD card for later use. Baud rate is set to 115200 bps. Refer to SC03MPA User Manual, Rev. C for more details.
+This module retrieves image capture data. Image data is stored as hex data which can be read and converted to a jpeg file using an editor such as Notepad++.  Image data can be stored on an SD card for later use. Baud rate is set to 115200 bps. Refer to SC03MPA User Manual, Rev. C for more details. 
 ##### Camera Image Capture Example
 
 ![EcoSense Camera Response Image 8-15-21](https://user-images.githubusercontent.com/62213019/129496232-ca1dcfe2-618c-4a0b-bdc5-17be9190a87b.jpg)
