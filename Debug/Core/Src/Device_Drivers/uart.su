@@ -1,0 +1,8 @@
+uart.c:43:6:uart_tx	24	static
+uart.c:61:6:uart_rx_print	16	static
+uart.c:80:6:uart_rx_flush	16	static
+uart.c:99:9:uart_rx_check	16	static
+uart.c:125:10:uart_rx_find	24	static
+uart.c:157:6:LOG	32	static
+uart.c:178:6:LOG_BOX	16	static
+uart.c:190:6:uart_isr	16	static

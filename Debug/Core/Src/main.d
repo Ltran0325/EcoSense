@@ -27,7 +27,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- ../Core/Inc/uart.h
+ ../Core/Inc/uart.h \
+ ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
+ ../Core/Inc/api_camera.h ../Core/Inc/uart.h ../Core/Inc/api_wifi.h \
+ ../Core/Inc/round_robin.h
 
 ../Core/Inc/main.h:
 
@@ -88,3 +91,13 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 
 ../Core/Inc/uart.h:
+
+../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
+
+../Core/Inc/api_camera.h:
+
+../Core/Inc/uart.h:
+
+../Core/Inc/api_wifi.h:
+
+../Core/Inc/round_robin.h:

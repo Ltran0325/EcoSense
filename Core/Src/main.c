@@ -56,10 +56,9 @@ UART_HandleTypeDef huart3;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
-
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -78,6 +77,34 @@ int main(void){
 
 	while(1){
 
+#if 0
+		HAL_Delay(100);
+		LOG("Hello\r\n");
+		api_wifi_echodisable();
+		HAL_Delay(100);
+		api_wifi_check();
+		HAL_Delay(100);
+#endif
+
+#if 0
+		api_wifi_connect();
+		HAL_Delay(5000);
+		api_wifi_ping();
+#endif
+
+#if 0
+		api_wifi_connect();
+		HAL_Delay(5000);
+		api_wifi_ping();
+#endif
+
+#if 1
+
+		api_camera_connect();
+		HAL_Delay(5000);
+#endif
+
+#if 0
 		switch(rrCurrentState){
 
 		case START:
@@ -89,7 +116,8 @@ int main(void){
 		case CAMERA:
 
 			// camera image data get using SC03MPA module
-			api_camera_connect();
+			//api_camera_connect();
+			HAL_Delay(1000);
 
 			rrPreviousState = rrCurrentState;
 			rrCurrentState = WIFI;
@@ -100,6 +128,7 @@ int main(void){
 
 			// Wi-Fi ping to google.com using WE310F5-I dev kit
 			api_wifi_connect();
+			HAL_Delay(1000);
 
 			rrPreviousState = rrCurrentState;
 			rrCurrentState = DATA_AQ;
@@ -111,9 +140,10 @@ int main(void){
 		case DATA_AQ:
 
 			// retreive information from sensors
-			api_camera_connect();
+			//api_camera_connect();
+			HAL_Delay(1000);
 			api_wifi_ping();
-
+			HAL_Delay(1000);
 			// upload information
 
 			// return to Wi-Fi or LTE
@@ -122,15 +152,10 @@ int main(void){
 			break;
 
 		}
-
+#endif
 	}
 
 }
-
-
-
-/* USER CODE END 0 */
-
 
 /**
   * @brief System Clock Configuration
@@ -219,7 +244,8 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-  USART1->CR1 |= USART_CR1_RXNEIE; // enable RX interrupt (always active)
+  USART1->CR1 |= USART_CR1_RXNEIE; // Enable RXNE interrupt
+  USART1->RQR |= USART_RQR_RXFRQ;  // Clear RXNE flag
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -254,7 +280,8 @@ static void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-
+  //USART2->CR1 |= USART_CR1_RXNEIE; // enable RX interrupt
+  USART2->RQR |= USART_RQR_RXFRQ;  // Clear RXNE flag
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -289,8 +316,8 @@ static void MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
-  USART3->CR1 |= USART_CR1_RXNEIE; // enable RX interrupt (always active)
-
+  USART3->CR1 |= USART_CR1_RXNEIE; // enable RX interrupt
+  USART3->RQR |= USART_RQR_RXFRQ;  // Clear RXNE flag
   /* USER CODE END USART3_Init 2 */
 
 }

@@ -1,0 +1,7 @@
+api_camera.c:35:6:api_camera_connect	8	static
+api_camera.c:84:6:api_camera_stopcap	8	static
+api_camera.c:107:6:api_camera_imageres	8	static
+api_camera.c:130:6:api_camera_imagecomp	8	static
+api_camera.c:155:6:api_camera_imageget	8	static
+api_camera.c:180:6:api_camera_imagelen	16	static
+api_camera.c:210:6:api_camera_imagedata	16	static

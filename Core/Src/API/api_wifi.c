@@ -45,15 +45,23 @@ WiFi_Struct* AP_List_Known[3] = { &AP_1, &AP_2, &AP_3 };
 /*****************************************************************************/
 char api_wifi_connect(void){
 
+	HAL_Delay(20);
+	if( api_wifi_echodisable() ){
+		return FAIL;
+	}
+
+	HAL_Delay(20);
 	if( api_wifi_station() ){
 		return FAIL;
 	}
 
+	HAL_Delay(20);
 	if( api_wifi_scan() ){
 		return FAIL;
 	}
 
-	if( api_wifi_connect() ){
+	HAL_Delay(20);
+	if( api_wifi_known() ){
 		return FAIL;
 	}
 
@@ -68,12 +76,16 @@ char api_wifi_connect(void){
 /*****************************************************************************/
 char api_wifi_ping(void){
 
-	uart_tx(AT_ping, strlen(AT_ping), CAMERA_UART);
+	HAL_Delay(20);
+	uart_tx(AT_ping, strlen(AT_ping), WIFI_UART);
 
-	if( uart_rx_check(Resp_WIFI_PING, strlen(Resp_WIFI_PING), 100) ){
+	if( uart_rx_check(Resp_WIFI_SUCCESS, strlen(Resp_WIFI_SUCCESS), 10 * UART_1S_TIMEOUT) ){
+		LOG("ERROR: Packets returned unsuccessfully.\r\n");
+		uart_rx_print();
 		return FAIL;
 	}
 
+	uart_rx_print();
 	return PASS;
 }
 
@@ -90,30 +102,15 @@ char api_wifi_ping(void){
 /*****************************************************************************/
 char api_wifi_station(void){
 
-	uart_tx(AT_station, strlen(AT_station), CAMERA_UART);
+	uart_tx(AT_station, strlen(AT_station), WIFI_UART);
 
-	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), 10) ){
+	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){
+		LOG("ERROR: No response.\r\n");
+		uart_rx_print();
 		return FAIL;
 	}
 
-	return PASS;
-}
-
-/*****************************************************************************/
-/*! @Function Name: api_wifi_known
- *  @brief        : Known AP connect command of USART Wi-Fi module. This command
- *  				connects to strongest known AP.
- *  @return       : pass or fail
- */
-/*****************************************************************************/
-char api_wifi_known(void){
-
-	uart_tx(AT_connect, strlen(AT_connect), CAMERA_UART);
-
-	if( uart_rx_check(Resp_WIFI_SCAN, strlen(Resp_WIFI_SCAN), 100) ){
-		return FAIL;
-	}
-
+	uart_rx_print();
 	return PASS;
 }
 
@@ -127,13 +124,27 @@ char api_wifi_known(void){
 /*****************************************************************************/
 char api_wifi_scan(void){
 
-	uart_tx(AT_scan, strlen(AT_scan), CAMERA_UART);
+	uart_tx(AT_scan, strlen(AT_scan), WIFI_UART);
 
-	if( uart_rx_check(Resp_WIFI_SCAN, strlen(Resp_WIFI_SCAN), 100) ){
+	HAL_Delay(3000);
+
+	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), 20 * UART_1S_TIMEOUT) ){
+		LOG("ERROR: No response.\r\n");
+		uart_rx_print();
 		return FAIL;
 	}
 
-	return api_wifi_scanparse();
+	uart_rx_print();
+
+	if( api_wifi_scanparse() ){
+		LOG("ERROR: Known AP(s) not found.\r\n");
+		uart_rx_print();
+		return FAIL;
+	}else{
+		LOG("Known AP(s) found.\r\n");
+		uart_rx_print();
+		return PASS;
+	}
 
 }
 
@@ -197,4 +208,65 @@ char api_wifi_scanparse(void)
 	return Status;
 }
 
+
+/*****************************************************************************/
+/*! @Function Name: api_wifi_known
+ *  @brief        : Known AP connect command of USART Wi-Fi module. This command
+ *  				connects to strongest known AP.
+ *  @return       : pass or fail
+ */
+/*****************************************************************************/
+char api_wifi_known(void){
+
+	uart_tx(AT_connect, strlen(AT_connect), WIFI_UART);
+
+	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), 6 * UART_1S_TIMEOUT) ){
+		LOG("ERROR: Wi-Fi connection may already be established.\r\n");
+		uart_rx_print();
+		return FAIL;
+	}
+
+	uart_rx_print();
+	return PASS;
+}
+
+/*****************************************************************************/
+/*! @Function Name: api_wifi_station
+ *  @brief        : Echo disable command of USART Wi-Fi module.
+ *  @return       : pass or fail
+ */
+/*****************************************************************************/
+char api_wifi_echodisable(void){
+
+	uart_tx(AT_echodisable, strlen(AT_echodisable), WIFI_UART);
+
+	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){
+		LOG("ERROR: No response.\r\n");
+		uart_rx_print();
+		return FAIL;
+	}
+
+	uart_rx_print();
+	return PASS;
+}
+
+/*****************************************************************************/
+/*! @Function Name: api_wifi_check
+ *  @brief        : Check for return response.
+ *  @return       : pass or fail
+ */
+/*****************************************************************************/
+char api_wifi_check(void){
+
+	uart_tx(AT_check, strlen(AT_check), WIFI_UART);
+
+	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){
+		LOG("ERROR: No response.\r\n");
+		uart_rx_print();
+		return FAIL;
+	}
+
+	uart_rx_print();
+	return PASS;
+}
 /******************** WI-FI API END ******************************************/

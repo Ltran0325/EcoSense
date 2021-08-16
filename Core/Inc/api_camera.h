@@ -1,10 +1,10 @@
 /*****************************************************************************/
 /*!
  * @project    EcoSense
- * @file       api_camera.c
+ * @file       api_camera.h
  * @author     Long Tran
  * @version    1.1
- * @brief	   Camera handler
+ * @brief	   Camera Handler
  * @date       28/July/2021
  * @bug        NA
 
@@ -12,16 +12,39 @@
  */
 /*****************************************************************************/
 
-/******************** INCLUDE FILES ******************************************/
-#include "stdint.h"
-#include "stm32l476xx.h"
-#include "api_camera.h"
+
+/******************** HEADER FILES *******************************************/
 #include "uart.h"
+/******************** DEFINE MACROS ******************************************/
 
 /******************** GLOBAL VARIABLES ***************************************/
-char imagedata[] = {0x56, 0x00, 0x32, 0x0C, 0x00, 0x0A, 0x00, 0x00,
-		            0x00, 0x00, 0x00, 0x00, 0xBE, 0xEF, 0x00, 0x0A};
 
+/******************** DEFINE ENUMS and STRUCT ********************************/
+
+/******************** DEFINE GLOBAL VARIABLES  *******************************/
+
+uint16_t camera_buff[BUFF_MAX];
+
+// Hex commands to test SC03MPA camera
+static char stopcap[]    = {0x56, 0x00, 0x36, 0x01, 0x03};
+static char imageres[]   = {0x56, 0x00, 0x54, 0x01, 0x22}; // set image resolution to 160x120 (smallest setting)
+static char imagecomp[]  = {0x56, 0x00, 0x31, 0x05, 0x01, 0x01, 0x12, 0x04, 0x99}; // set compression ratio to 99 (most compressed)
+static char imagebaud[]  = {0x56, 0x00, 0x24, 0x03, 0x01, 0x0D, 0xA6}; // set camera to 115200 baud
+static char imageget[]   = {0x56, 0x00, 0x36, 0x01, 0x00};
+static char imagelen[]   = {0x56, 0x00, 0x34, 0x01, 0x00};
+extern char imagedata[];
+static char imagereset[] = {0x56, 0x00, 0x26, 0x00};
+
+// Hex responses
+static char Resp_CAM_STOPCAP[]    = {0x76, 0x00, 0x36, 0x00, 0x00};
+static char Resp_CAM_RESOLUTION[] = {0x76, 0x00, 0x54, 0x00, 0x00};
+static char Resp_CAM_COMPRESS[]   = {0x76, 0x00, 0x31, 0x00, 0x00};
+static char Resp_CAM_BAUD[]       = {0x76, 0x00, 0x24, 0x00, 0x00};
+static char Resp_CAM_IMAGEGET[]   = {0x76, 0x00, 0x36, 0x00, 0x00};
+static char Resp_CAM_LENGTH[]     = {0x76, 0x00, 0x34, 0x00, 0x04, 0x00, 0x00};
+static char Resp_CAM_DATASTART[]  = {0xFF, 0xD8};
+static char Resp_CAM_DATAEND[]    = {0xFF, 0xD9, 0x76, 0x00, 0x32, 0x00, 0x00};
+static char Resp_CAM_RESET[]      = {0x76, 0x00, 0x26, 0x00};
 
 /******************** CAMERA APPLICATION FUNCTIONS START *********************/
 
@@ -32,43 +55,7 @@ char imagedata[] = {0x56, 0x00, 0x32, 0x0C, 0x00, 0x0A, 0x00, 0x00,
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_connect(void){
-
-	LOG_BOX("\r\nBeginning camera capture image sequence.\r\n");
-
-	if( api_camera_stopcap() ){
-		return FAIL;
-	}
-
-	if( api_camera_imageres() ){
-		return FAIL;
-	}
-
-	if( api_camera_imagecomp() ){
-		return FAIL;
-	}
-
-	if( api_camera_imageget() ){
-		return FAIL;
-	}
-
-	if( api_camera_imagelen() ){
-		return FAIL;
-	}
-
-	if( api_camera_imagedata() ){
-		return FAIL;
-	}
-
-	if( api_camera_stopcap() ){
-		return FAIL;
-	}
-
-	LOG_BOX("\r\nSUCCESS: Camera image captured successfully.\r\n");
-
-	return PASS;
-}
-
+char api_camera_connect(void);
 
 /******************** CAMERA APPLICATION FUNCTIONS END ***********************/
 
@@ -81,22 +68,7 @@ char api_camera_connect(void){
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_stopcap(void){
-
-	LOG_BOX("SEND: camera stop capture");
-	uart_tx(stopcap, 5, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_STOPCAP, 5, UART_1S_TIMEOUT) ){
-		LOG("ERROR: Bad response");
-		uart_rx_print();
-		return FAIL;
-	}else{
-		uart_rx_print();
-		return PASS;
-	}
-
-	return FAIL; // Out of bounds
-}
+char api_camera_stopcap(void);
 
 /*****************************************************************************/
 /*! @Function Name: api_camera_imageres
@@ -104,45 +76,14 @@ char api_camera_stopcap(void){
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_imageres(void){
-
-	LOG_BOX("SEND: camera image resolution to 160x120");
-	uart_tx(imageres, 5, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_RESOLUTION, 5, UART_1S_TIMEOUT) ){
-		LOG("ERROR: Bad response");
-		uart_rx_print();
-		return FAIL;
-	}else{
-		uart_rx_print();
-		return PASS;
-	}
-
-	return FAIL; // Out of bounds
-}
-
+char api_camera_imageres(void);
 /*****************************************************************************/
 /*! @Function Name: api_camera_imagecomp
  *  @brief        : Set compression ratio of USART camera module.
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_imagecomp(void){
-
-	LOG_BOX("SEND: camera image compression ratio to 99");
-	uart_tx(imagecomp, 9, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_COMPRESS, 5, UART_1S_TIMEOUT) ){
-		LOG("ERROR: Bad response");
-		uart_rx_print();
-		return FAIL;
-	}else{
-		uart_rx_print();
-		return PASS;
-	}
-
-	return FAIL; // Out of bounds
-}
+char api_camera_imagecomp(void);
 
 /*****************************************************************************/
 /*! @Function Name: api_camera_imageget
@@ -152,22 +93,7 @@ char api_camera_imagecomp(void){
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_imageget(void){
-
-	LOG_BOX("SEND: camera image get");
-	uart_tx(imageget, 5, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_IMAGEGET, 5, UART_1S_TIMEOUT) ){
-		LOG("ERROR: Bad response");
-		uart_rx_print();
-		return FAIL;
-	}else{
-		uart_rx_print();
-		return PASS;
-	}
-
-	return FAIL; // Out of bounds
-}
+char api_camera_imageget(void);
 
 /*****************************************************************************/
 /*! @Function Name: api_camera_imagelen
@@ -177,28 +103,7 @@ char api_camera_imageget(void){
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_imagelen(void){
-
-	uint16_t i = 0;
-
-	LOG_BOX("SEND: camera image length");
-	uart_tx(imagelen, 5, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_LENGTH, 7, UART_1S_TIMEOUT) ){
-		LOG("\r\nERROR: Bad response.\r\n");
-		uart_rx_print();
-		return FAIL;
-	}
-
-	i = uart_rx_find(Resp_CAM_LENGTH, 7);
-	imagedata[12] = rx_buff[i];
-	imagedata[13] = rx_buff[i+1];
-
-	LOG("\r\nSuccess: image length \r\n");
-	uart_rx_print();
-
-	return PASS;
-}
+char api_camera_imagelen(void);
 
 /*****************************************************************************/
 /*! @Function Name: api_camera_imagedata
@@ -207,30 +112,6 @@ char api_camera_imagelen(void){
  *  @return       : pass or fail
  */
 /*****************************************************************************/
-char api_camera_imagedata(void){
-
-	uint16_t camera_idx = 0, i = 0, offset = 0;
-
-	LOG_BOX("SEND: camera image data");
-	uart_tx(imagedata, 16, CAMERA_UART);
-
-	if( uart_rx_check(Resp_CAM_DATAEND, 7, 3 * UART_1S_TIMEOUT) ){
-		LOG("\r\nERROR: Bad response.\r\n");
-		uart_rx_print();
-		return FAIL;
-	}
-
-	offset = uart_rx_find(Resp_CAM_DATASTART, 2) - 2;
-	i = offset;
-
-	while( i < rx_idx - offset){
-		camera_buff[camera_idx] = rx_buff[i];
-		camera_idx++;
-		i++;
-	}
-
-	uart_rx_print();
-
-	return PASS;
-}
+char api_camera_imagedata(void);
 /******************** CAMERA API END *****************************************/
+

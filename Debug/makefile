@@ -11,6 +11,8 @@ RM := rm -rf
 -include sources.mk
 -include Drivers/STM32L4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
+-include Core/Src/Device_Drivers/subdir.mk
+-include Core/Src/API/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -35,34 +37,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := ASI Test5
+BUILD_ARTIFACT_NAME := EcoSense_0.0.1
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX := 
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-ASI\ Test5.elf \
+EcoSense_0.0.1.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-ASI\ Test5.list \
+EcoSense_0.0.1.list \
 
 OBJCOPY_BIN += \
-ASI\ Test5.bin \
+EcoSense_0.0.1.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: ASI\ Test5.elf secondary-outputs
+main-build: EcoSense_0.0.1.elf secondary-outputs
 
 # Tool invocations
-ASI\ Test5.elf: $(OBJS) $(USER_OBJS) C:\Users\HP2021\STM32Cube\Nucleo\ Projects\ASI\ Test5\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "ASI Test5.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\HP2021\STM32Cube\Nucleo Projects\ASI Test5\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ASI Test5.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+EcoSense_0.0.1.elf: $(OBJS) $(USER_OBJS) C:\Users\HP2021\STM32Cube\Nucleo\ Projects\EcoSense_0.0.1\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "EcoSense_0.0.1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\HP2021\STM32Cube\Nucleo Projects\EcoSense_0.0.1\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EcoSense_0.0.1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,13 +73,13 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-ASI\ Test5.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ASI Test5.list"
+EcoSense_0.0.1.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "EcoSense_0.0.1.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-ASI\ Test5.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "ASI Test5.bin"
+EcoSense_0.0.1.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "EcoSense_0.0.1.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
