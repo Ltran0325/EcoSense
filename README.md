@@ -11,19 +11,19 @@ Nature conservation project to collect and upload ecosystem data.
 3. GPS
 4. LTE
 
-#### Camera SC03MPA JPEG
+### Camera SC03MPA JPEG
 
 <img src="https://user-images.githubusercontent.com/62213019/129508413-652027ef-157e-4c27-ad5e-a5b9157f291c.png" width="160" height="120" />
 
 This UART module captures image data in hex format. Image data can be viewed and converted to JPEG using an editor such as Notepad+. Image data may also be stored on an SD card. For more information, refer to SC03MPA: 03 Mega Pixels Serial JPEG Camera User Manual. 
 
-##### Camera Image Example
+### Camera Image Example
 
 Image data can be parsed in Notepad+.
 
 ![EcoSense Camera Response Image 8-15-21](https://user-images.githubusercontent.com/62213019/129508165-53c0614f-3a60-4c09-9e6a-7f8b801717e3.jpg)
 
-##### Camera Response Example (CoolTerm)
+### Camera Response Example (CoolTerm)
 
 ************************************************
 
@@ -85,9 +85,9 @@ SUCCESS: Camera image captured successfully.
 
 ************************************************
 
-#### WiFi: 
+### WiFi: 
 
-#### GPS: 
+### GPS: 
 
 ## **Hardware:**
 ## **Firmware:**
