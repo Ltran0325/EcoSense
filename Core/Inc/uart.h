@@ -3,7 +3,7 @@
  * @project    EcoSense
  * @file       uart.h
  * @author     Long Tran
- * @version    1.1
+ * @version    0.0.1
  * @brief	   UART handler
  * @date       28/July/2021
  * @bug        NA
@@ -29,6 +29,7 @@
 #define WIFI_UART   USART1
 #define PC_UART     USART2
 #define CAMERA_UART USART3
+#define LTEGPS_UART UART4
 
 #define UART_DELAY      20
 #define UART_1S_TIMEOUT 1000/UART_DELAY

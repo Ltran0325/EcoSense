@@ -1,8 +1,8 @@
 api_wifi.c:46:6:api_wifi_connect	8	static
 api_wifi.c:77:6:api_wifi_ping	8	static
-api_wifi.c:103:6:api_wifi_station	8	static
-api_wifi.c:125:6:api_wifi_scan	8	static
-api_wifi.c:158:6:api_wifi_scanparse	32	static
-api_wifi.c:219:6:api_wifi_known	8	static
-api_wifi.c:239:6:api_wifi_echodisable	8	static
-api_wifi.c:259:6:api_wifi_check	8	static
+api_wifi.c:105:6:api_wifi_station	8	static
+api_wifi.c:128:6:api_wifi_scan	8	static
+api_wifi.c:162:6:api_wifi_scanparse	32	static
+api_wifi.c:223:6:api_wifi_known	8	static
+api_wifi.c:244:6:api_wifi_echodisable	8	static
+api_wifi.c:265:6:api_wifi_check	8	static

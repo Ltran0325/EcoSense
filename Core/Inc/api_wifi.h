@@ -3,7 +3,7 @@
  * @project    EcoSense
  * @file       api_wifi.h
  * @author     Long Tran
- * @version    1.1
+ * @version    0.0.1
  * @brief	   Wi-Fi handler
  * @date       28/July/2021
  * @bug        NA
@@ -42,7 +42,7 @@ static char AT_check[]  		= "AT\r\n";
 static char AT_station[] 		= "AT+WNI=0\r\n";
 static char AT_scan[]   	    = "AT+WS=1\r\n";
 static char AT_connect[] 		= "AT+WNCN=1,\"Trans 5G\",\"2232portal\"\r\n";
-static char AT_ping[]    		= "AT+NPING=8.8.8.8,64,1\r\n";
+static char AT_ping[]    		= "AT+NPING=8.8.8.8,64,3\r\n";
 static char AT_echodisable[] 	= "ATE0\r\n";
 
 // WiFi AT responses

@@ -3,7 +3,7 @@
  * @project    EcoSense
  * @file       uart.c
  * @author     Long Tran
- * @version    1.1
+ * @version    0.0.1
  * @brief	   UART handler
  * @date       28/July/2021
  * @bug        NA

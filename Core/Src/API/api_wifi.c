@@ -3,7 +3,7 @@
  * @project    EcoSense
  * @file       api_wifi.c
  * @author     Long Tran
- * @version    1.1
+ * @version    0.0.1
  * @brief	   Wi-Fi handler
  * @date       28/July/2021
  * @bug        NA
@@ -77,6 +77,7 @@ char api_wifi_connect(void){
 char api_wifi_ping(void){
 
 	HAL_Delay(20);
+	LOG_BOX("SEND: Ping to www.google.com");
 	uart_tx(AT_ping, strlen(AT_ping), WIFI_UART);
 
 	if( uart_rx_check(Resp_WIFI_SUCCESS, strlen(Resp_WIFI_SUCCESS), 10 * UART_1S_TIMEOUT) ){
@@ -87,6 +88,7 @@ char api_wifi_ping(void){
 
 	uart_rx_print();
 	return PASS;
+
 }
 
 /******************** WI-FI APPLICATION FUNCTIONS END ************************/
@@ -102,6 +104,7 @@ char api_wifi_ping(void){
 /*****************************************************************************/
 char api_wifi_station(void){
 
+	LOG_BOX("SEND: Setting to station mode");
 	uart_tx(AT_station, strlen(AT_station), WIFI_UART);
 
 	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){
@@ -124,6 +127,7 @@ char api_wifi_station(void){
 /*****************************************************************************/
 char api_wifi_scan(void){
 
+	LOG_BOX("SEND: Scanning nearby APs");
 	uart_tx(AT_scan, strlen(AT_scan), WIFI_UART);
 
 	HAL_Delay(3000);
@@ -218,6 +222,7 @@ char api_wifi_scanparse(void)
 /*****************************************************************************/
 char api_wifi_known(void){
 
+	LOG_BOX("SEND: Connecting to known AP");
 	uart_tx(AT_connect, strlen(AT_connect), WIFI_UART);
 
 	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), 6 * UART_1S_TIMEOUT) ){
@@ -238,6 +243,7 @@ char api_wifi_known(void){
 /*****************************************************************************/
 char api_wifi_echodisable(void){
 
+	LOG_BOX("SEND: Disabling echo");
 	uart_tx(AT_echodisable, strlen(AT_echodisable), WIFI_UART);
 
 	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){
@@ -258,6 +264,7 @@ char api_wifi_echodisable(void){
 /*****************************************************************************/
 char api_wifi_check(void){
 
+	LOG_BOX("SEND: Checking response");
 	uart_tx(AT_check, strlen(AT_check), WIFI_UART);
 
 	if( uart_rx_check(Resp_WIFI_OK, strlen(Resp_WIFI_OK), UART_1S_TIMEOUT) ){

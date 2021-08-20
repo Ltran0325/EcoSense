@@ -3,7 +3,7 @@
  * @project    EcoSense
  * @file       api_camera.c
  * @author     Long Tran
- * @version    1.1
+ * @version    0.0.1
  * @brief	   Camera handler
  * @date       28/July/2021
  * @bug        NA

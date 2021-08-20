@@ -43,6 +43,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
@@ -59,6 +60,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -66,39 +68,78 @@ static void MX_USART1_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int main(void){
+/* USER CODE END 0 */
 
-	HAL_Init();
-	SystemClock_Config();
-	MX_GPIO_Init();
-	MX_USART1_UART_Init();
-	MX_USART2_UART_Init();
-	MX_USART3_UART_Init();
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
 
-	while(1){
+  /* USER CODE END 1 */
 
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
+  MX_USART1_UART_Init();
+  MX_UART4_Init();
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
 #if 0
-		HAL_Delay(100);
-		LOG("Hello\r\n");
-		api_wifi_echodisable();
-		HAL_Delay(100);
-		api_wifi_check();
-		HAL_Delay(100);
-#endif
-
-#if 0
-		api_wifi_connect();
-		HAL_Delay(5000);
-		api_wifi_ping();
-#endif
-
-#if 0
-		api_wifi_connect();
-		HAL_Delay(5000);
-		api_wifi_ping();
+	    api_ltegps_check();
+		HAL_Delay(1000);
+		api_ltegps_gpsconnect();
+		api_ltegps_lteconnect();
+		api_ltegps_lteping();
+		HAL_Delay(1000);
 #endif
 
 #if 1
+		api_wifi_check();
+		HAL_Delay(1000);
+		api_wifi_check();
+		HAL_Delay(1000);
+		api_wifi_check();
+		HAL_Delay(1000);
+		api_wifi_connect();
+		HAL_Delay(1000);
+		api_wifi_ping();
+		__NOP();
+#endif
+
+#if 0
+		api_wifi_connect();
+		HAL_Delay(5000);
+		api_wifi_ping();
+#endif
+
+#if 0
 
 		api_camera_connect();
 		HAL_Delay(5000);
@@ -153,8 +194,9 @@ int main(void){
 
 		}
 #endif
-	}
-
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
 }
 
 /**
@@ -198,10 +240,11 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
-                              |RCC_PERIPHCLK_USART3;
+                              |RCC_PERIPHCLK_USART3|RCC_PERIPHCLK_UART4;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
+  PeriphClkInit.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -212,6 +255,42 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+  UART4->CR1 |= USART_CR1_RXNEIE; // Enable RXNE interrupt
+  UART4->RQR |= USART_RQR_RXFRQ;  // Clear RXNE flag
+  /* USER CODE END UART4_Init 2 */
+
 }
 
 /**

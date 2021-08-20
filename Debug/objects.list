@@ -1,4 +1,5 @@
 "Core/Src/API/api_camera.o"
+"Core/Src/API/api_ltegps_.o"
 "Core/Src/API/api_wifi.o"
 "Core/Src/Device_Drivers/uart.o"
 "Core/Src/main.o"
