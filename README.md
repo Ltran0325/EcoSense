@@ -90,5 +90,20 @@ SUCCESS: Camera image captured successfully.
 ### GPS: 
 
 ## **Hardware:**
-## **Firmware:**
+
+![L476RG Pin Layout](https://user-images.githubusercontent.com/62213019/131071131-a4c73dff-ed35-4df6-aedc-7b8a4671b126.png)
+
+Connections: 
+
+<img width="578" alt="Screen Shot 2021-08-26 at 9 49 31 PM" src="https://user-images.githubusercontent.com/62213019/131073513-6aca1351-f9c1-4b5e-aafb-646898cb1dbf.png">
+
+Wi-Fi:  USART1
+
+PC:     USART2
+
+Camera: USART3
+
+LTEGPS: UART4
+
+## **Drivers:**
 
